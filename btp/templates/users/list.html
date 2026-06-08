@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #0d6efd, #4f8cff);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+    }
+
+    .card-box {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .btn-modern {
+        border-radius: 10px;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="mb-0">👤 Gestion Utilisateurs</h3>
+            <small>Administration des comptes utilisateurs</small>
+        </div>
+
+        <a href="{% url 'create_user' %}" class="btn btn-light btn-modern">
+            ➕ Ajouter utilisateur
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-box">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Statut</th>
+                    <th>Rôle</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for user in users %}
+                <tr>
+
+                    <td>{{ user.id }}</td>
+
+                    <td>
+                        <strong>{{ user.username }}</strong>
+                    </td>
+
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge bg-success">Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger">Bloqué</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% for g in user.groups.all %}
+                            <span class="badge bg-primary">{{ g.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">Aucun</span>
+                        {% endfor %}
+                    </td>
+
+                    <td class="text-end">
+
+                        <a href="{% url 'toggle_user' user.id %}"
+                           class="btn btn-warning btn-sm btn-modern">
+                            Activer/Désactiver
+                        </a>
+
+                        <a href="{% url 'delete_user' user.id %}"
+                           class="btn btn-danger btn-sm btn-modern"
+                           onclick="return confirm('Supprimer cet utilisateur ?')">
+                            Supprimer
+                        </a>
+
+                    </td>
+
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des devis{% endblock %}
+
+{% block content %}
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #0d6efd, #4f8cff);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.card-box {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.btn-modern {
+    border-radius: 10px;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-size: 14px;
+}
+</style>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+        <div>
+            <h3 class="mb-0">📄 Gestion des devis</h3>
+            <small>Liste complète des devis BTP</small>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-modern">
+                🏠 Accueil
+            </a>
+
+            <a href="{% url 'create_devis' %}" class="btn btn-light btn-modern">
+                ➕ Nouveau devis
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-box">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+                <tr>
+                    <th>Numéro</th>
+                    <th>Projet</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for d in devis %}
+                <tr>
+
+                    <td><strong>{{ d.numero }}</strong></td>
+
+                    <td>🏗️ {{ d.projet.nom }}</td>
+
+                    <td>{{ d.date_creation|date:"d/m/Y H:i" }}</td>
+
+                    <td>
+                        <span class="badge bg-warning text-dark">
+                            {{ d.statut }}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+                        <a href="{% url 'devis_pdf' d.id %}" class="btn btn-danger btn-sm btn-modern">
+                            PDF
+                        </a>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">
+                        🚫 Aucun devis trouvé
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
