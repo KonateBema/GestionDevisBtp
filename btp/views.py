@@ -186,7 +186,7 @@ def devis_pdf(request, id):
     return response
 
 
-def dashboard(request):
+def dashboardBB(request):
     clients_count = Client.objects.count()
     projets_count = Projet.objects.count()
     devis_count = Devis.objects.count()
@@ -201,6 +201,40 @@ def dashboard(request):
         'devis_count': devis_count,
         'total_general': total_general,
     })
+
+from .models import Client, Projet, Devis, LigneDevis, Materiau
+
+def dashboard(request):
+
+    clients_count = Client.objects.count()
+    projets_count = Projet.objects.count()
+    devis_count = Devis.objects.count()
+    materiaux_count = Materiau.objects.count()
+
+    # 💰 CA TOTAL
+    total_ca = sum(devis.total() for devis in Devis.objects.all())
+
+    # 📊 STATUT DEVIS
+    devis_brouillon = Devis.objects.filter(statut="brouillon").count()
+    devis_envoye = Devis.objects.filter(statut="envoye").count()
+    devis_accepte = Devis.objects.filter(statut="accepte").count()
+    devis_refuse = Devis.objects.filter(statut="refuse").count()
+
+    return render(request, 'dashboard.html', {
+        'clients_count': clients_count,
+        'projets_count': projets_count,
+        'devis_count': devis_count,
+        'materiaux_count': materiaux_count,
+        'total_ca': total_ca,
+
+        # charts
+        'devis_brouillon': devis_brouillon,
+        'devis_envoye': devis_envoye,
+        'devis_accepte': devis_accepte,
+        'devis_refuse': devis_refuse,
+    })
+
+
 
 from django.contrib.auth.decorators import user_passes_test
 
