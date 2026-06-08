@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ['*']
 #     '127.0.0.1',
 # ]
 # Application definition
+CSRF_TRUSTED_ORIGINS = [
+    'https://gestiondevisbtp.onrender.com',
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -41,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'btp',
+    "btp",
 ]
 
 MIDDLEWARE = [
@@ -59,8 +62,7 @@ ROOT_URLCONF = "gestion_btp.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        'DIRS': [BASE_DIR / 'templates'],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -121,6 +123,12 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+import os
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 STATIC_URL = "static/"
 
