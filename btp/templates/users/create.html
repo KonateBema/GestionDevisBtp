@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer utilisateur{% endblock %}
+
+{% block content %}
+
+<style>
+    .card-box {
+        max-width: 500px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .header {
+        background: linear-gradient(135deg, #198754, #2ecc71);
+        color: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .btn-modern {
+        border-radius: 10px;
+        padding: 10px;
+        width: 100%;
+        font-weight: bold;
+    }
+</style>
+
+<div class="card-box">
+
+    <div class="header">
+        <h4 class="mb-0">➕ Créer utilisateur</h4>
+        <small>Ajouter un nouvel utilisateur au système</small>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text"
+               name="username"
+               class="form-control mb-3"
+               placeholder="Username"
+               required>
+
+        <input type="password"
+               name="password"
+               class="form-control mb-3"
+               placeholder="Mot de passe"
+               required>
+
+        <select name="role" class="form-control mb-3">
+            {% for g in groups %}
+                <option value="{{ g.name }}">{{ g.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button class="btn btn-success btn-modern">
+            ✔ Créer utilisateur
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

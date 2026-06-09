@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des projets{% endblock %}
+
+{% block content %}
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #0d6efd, #4f8cff);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.card-box {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.project-item {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.project-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.badge-client {
+    background: #e9f2ff;
+    color: #0d6efd;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.btn-modern {
+    border-radius: 10px;
+}
+</style>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+        <div>
+            <h3 class="mb-0">🏗️ Liste des projets</h3>
+            <small>Gestion des projets clients</small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'dashboard' %}" class="btn btn-light btn-modern">
+                ⬅ Accueil
+            </a>
+
+            <a href="{% url 'create_projet' %}" class="btn btn-success btn-modern">
+                ➕ Nouveau projet
+            </a>
+        </div>
+
+    </div>
+
+    <!-- LIST -->
+    <div class="card-box">
+
+        {% for projet in projets %}
+
+        <div class="project-item d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="mb-1">🏗️ {{ projet.nom }}</h5>
+                <span class="badge-client">
+                    👤 {{ projet.client.nom }}
+                </span>
+            </div>
+
+            <div>
+                <a href="#" class="btn btn-outline-primary btn-sm btn-modern">
+                    Voir
+                </a>
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="text-center text-muted py-4">
+            🚫 Aucun projet disponible
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

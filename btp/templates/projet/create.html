@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un projet{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-container {
+        max-width: 650px;
+        margin: 30px auto;
+    }
+
+    .card-form {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        background: white;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #0d6efd, #4f8cff);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .btn-modern {
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="form-container">
+
+    <div class="card card-form">
+
+        <!-- HEADER -->
+        <div class="header text-center">
+            <h3 class="mb-0">🏗️ Créer un projet</h3>
+            <small>Ajouter un nouveau projet client</small>
+        </div>
+
+        <div class="p-4">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- CLIENT -->
+                <div class="mb-3">
+                    <label class="form-label">👤 Client</label>
+                    <select name="client" class="form-select" required>
+                        <option value="">-- Choisir un client --</option>
+                        {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- NOM -->
+                <div class="mb-3">
+                    <label class="form-label">🏗️ Nom du projet</label>
+                    <input type="text" name="nom" class="form-control" required>
+                </div>
+
+                <!-- LOCALISATION -->
+                <div class="mb-3">
+                    <label class="form-label">📍 Localisation</label>
+                    <input type="text" name="localisation" class="form-control">
+                </div>
+
+                <!-- DATE -->
+                <div class="mb-3">
+                    <label class="form-label">📅 Date de début</label>
+                    <input type="date" name="date_debut" class="form-control">
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-modern">
+                        ← Retour
+                    </a>
+
+                    <button type="submit" class="btn btn-primary btn-modern">
+                        ✅ Créer projet
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
