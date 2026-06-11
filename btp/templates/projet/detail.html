@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail projet{% endblock %}
+
+{% block content %}
+
+<style>
+
+.page-header{
+    background: linear-gradient(135deg,#0d6efd,#4f8cff);
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+.card-detail{
+    background:white;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    padding:25px;
+}
+
+.info-box{
+    background:#f8f9fa;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:12px;
+    /* border-left:4px solid #0d6efd; */
+}
+
+.label{
+    font-size:13px;
+    color:#6c757d;
+}
+
+.value{
+    font-size:16px;
+    font-weight:600;
+    color:#212529;
+}
+
+.badge-status{
+    padding:8px 12px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.progress{
+    height:22px;
+    border-radius:12px;
+    background:#e9ecef;
+}
+
+.progress-bar{
+    font-weight:600;
+}
+
+.price-box{
+    font-size:18px;
+    font-weight:700;
+    color:#198754;
+}
+
+.section-title{
+    font-weight:700;
+    margin-bottom:10px;
+    color:#343a40;
+    font-size:14px;
+}
+
+/* 🔥 GRAPHE RÉDUIT */
+.chart-wrapper{
+    width:200px;
+    height:200px;
+    margin:auto;
+}
+
+</style>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+
+        <div>
+            <h3 class="mb-0">🏗️ {{ projet.nom }}</h3>
+            <small>Détails du projet</small>
+        </div>
+
+        <a href="{% url 'liste_projets' %}" class="btn btn-light">
+            ⬅ Retour
+        </a>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="card-detail">
+
+        <!-- CLIENT -->
+        <div class="info-box">
+            <div class="label">👤 Client</div>
+            <div class="value">{{ projet.client.nom }}</div>
+        </div>
+
+        <!-- LOCALISATION -->
+        <div class="info-box">
+            <div class="label">📍 Localisation</div>
+            <div class="value">{{ projet.localisation }}</div>
+        </div>
+
+        <!-- BUDGET -->
+        <div class="info-box">
+            <div class="label">💰 Budget du projet</div>
+            <div class="price-box">
+                {{ projet.budget }} FCFA
+            </div>
+        </div>
+
+        <!-- PROGRESSION -->
+        <div class="info-box">
+            <div class="label">📊 Progression du chantier</div>
+
+            <div class="progress mt-2">
+                <div class="progress-bar bg-success"
+                     style="width: {{ projet.progression }}%">
+                    {{ projet.progression }}%
+                </div>
+            </div>
+        </div>
+
+        <!-- MINI GRAPH RÉDUIT -->
+        <div class="info-box">
+
+            <div class="section-title">📊 Suivi visuel</div>
+
+            <div class="chart-wrapper">
+                <canvas id="progressChart"></canvas>
+            </div>
+
+        </div>
+
+        <!-- DATE -->
+        <div class="info-box">
+            <div class="label">📅 Date de début</div>
+            <div class="value">{{ projet.date_debut }}</div>
+        </div>
+
+        <!-- STATUT -->
+        <div class="info-box">
+            <div class="label">📊 Statut</div>
+
+            {% if projet.statut == "EN_COURS" %}
+                <span class="badge bg-warning text-dark badge-status">
+                    En cours
+                </span>
+
+            {% elif projet.statut == "TERMINE" %}
+                <span class="badge bg-success badge-status">
+                    Terminé
+                </span>
+
+            {% else %}
+                <span class="badge bg-secondary badge-status">
+                    Nouveau
+                </span>
+            {% endif %}
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="d-flex gap-2 mt-3">
+
+            <a href="{% url 'edit_projet' projet.id %}" class="btn btn-warning">
+                ✏ Modifier
+            </a>
+
+            <a href="{% url 'delete_projet' projet.id %}"
+               class="btn btn-danger"
+               onclick="return confirm('Supprimer ce projet ?');">
+                🗑 Supprimer
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('progressChart');
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Avancement', 'Reste'],
+        datasets: [{
+            data: [
+                {{ projet.progression }},
+                100 - {{ projet.progression }}
+            ],
+            backgroundColor: ['#28a745', '#e9ecef']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+
+{% endblock %}

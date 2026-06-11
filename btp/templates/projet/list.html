@@ -82,12 +82,29 @@
                 </span>
             </div>
 
-            <div>
-                <a href="#" class="btn btn-outline-primary btn-sm btn-modern">
-                    Voir
-                </a>
-            </div>
+          
+            <div class="d-flex gap-2">
 
+                <!-- VOIR -->
+                <a href="{% url 'detail_projet' projet.id %}"
+                   class="btn btn-primary btn-sm btn-modern">
+                    👁 Voir
+                </a>
+            
+                <!-- MODIFIER -->
+                <a href="{% url 'edit_projet' projet.id %}"
+                   class="btn btn-warning btn-sm btn-modern">
+                    ✏ Modifier
+                </a>
+            
+                <!-- SUPPRIMER -->
+                <a href="{% url 'delete_projet' projet.id %}"
+                   class="btn btn-danger btn-sm btn-modern"
+                   onclick="return confirm('Voulez-vous vraiment supprimer ce projet ?');">
+                    🗑 Supprimer
+                </a>
+            
+            </div>
         </div>
 
         {% empty %}

@@ -35,9 +35,22 @@ urlpatterns = [
     path('backup/', views.backup_db, name='backup_db'),
 
     path('projets/create/', views.create_projet, name='create_projet'),
-    path('projets/', views.projet_list, name='projet_list'),
+    # path('projets/', views.projet_list, name='projet_list'),
+    path('projets/',views.liste_projets,name='liste_projets'),
     path('clients/create/', views.create_client, name='create_client'),
     path('materiaux/', views.materiaux_list, name='materiaux_list'),
     path('materiaux/create/', views.create_materiau, name='create_materiau'),
+    # path('clients/', views.clients, name='clients'),
+    path('clients/', views.liste_clients, name='liste_clients'),
+    path('clients/create/', views.create_client, name='create_client'),
+    path('clients/<int:id>/', views.detail_client, name='detail_client'),
+    path('clients/<int:id>/edit/',views.edit_client,name='edit_client'),
+    path('clients/<int:id>/delete/',views.delete_client,name='delete_client'),
+
+
+
+    path('projets/<int:id>/', views.detail_projet, name='detail_projet'),
+    path('projets/<int:id>/edit/', views.edit_projet, name='edit_projet'),
+    path('projets/<int:id>/delete/', views.delete_projet, name='delete_projet'),
     
 ]

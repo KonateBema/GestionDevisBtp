@@ -23,6 +23,9 @@ class Projet(models.Model):
     nom = models.CharField(max_length=200)
     localisation = models.CharField(max_length=255)
     date_debut = models.DateField(null=True, blank=True)
+     # 🔥 NOUVEAUX CHAMPS
+    budget = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    progression = models.IntegerField(default=0)  # 0 à 100 %
 
     def __str__(self):
         return self.nom
@@ -110,3 +113,9 @@ class Profil(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
+        
+class DocumentProjet(models.Model):
+    projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="documents")
+    fichier = models.FileField(upload_to="projets/documents/")
+    titre = models.CharField(max_length=255, blank=True, null=True)
+    date_upload = models.DateTimeField(auto_now_add=True)

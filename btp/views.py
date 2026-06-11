@@ -10,6 +10,8 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import  get_object_or_404
 from .models import Projet, Client
 from django.shortcuts import render, redirect
+from django.contrib import messages
+
 
 def home(request):
     return render(request, 'home.html')
@@ -186,55 +188,43 @@ def devis_pdf(request, id):
     return response
 
 
-def dashboardBB(request):
-    clients_count = Client.objects.count()
-    projets_count = Projet.objects.count()
-    devis_count = Devis.objects.count()
-
-    # calcul du total général des devis
-    devis = Devis.objects.all()
-    total_general = sum(d.total() for d in devis)
-
-    return render(request, 'dashboard.html', {
-        'clients_count': clients_count,
-        'projets_count': projets_count,
-        'devis_count': devis_count,
-        'total_general': total_general,
-    })
-
-from .models import Client, Projet, Devis, LigneDevis, Materiau
+from .models import Devis
 
 def dashboard(request):
 
     clients_count = Client.objects.count()
-    projets_count = Projet.objects.count()
-    devis_count = Devis.objects.count()
-    materiaux_count = Materiau.objects.count()
+    projets = Projet.objects.all()
+    devis_qs = Devis.objects.all()
 
-    # 💰 CA TOTAL
-    total_ca = sum(devis.total() for devis in Devis.objects.all())
+    projets_count = projets.count()
+    devis_count = devis_qs.count()
 
-    # 📊 STATUT DEVIS
-    devis_brouillon = Devis.objects.filter(statut="brouillon").count()
-    devis_envoye = Devis.objects.filter(statut="envoye").count()
-    devis_accepte = Devis.objects.filter(statut="accepte").count()
-    devis_refuse = Devis.objects.filter(statut="refuse").count()
+    total_ca = sum([d.total() if callable(d.total) else d.total for d in devis_qs])
+
+    derniers_devis = devis_qs.order_by('-id')[:5]
+
+    devis_brouillon = devis_qs.filter(statut="brouillon").count()
+    devis_envoye = devis_qs.filter(statut="envoye").count()
+    devis_accepte = devis_qs.filter(statut="accepte").count()
+    devis_refuse = devis_qs.filter(statut="refuse").count()
+
+    projets_retard = projets.filter(progression__lt=100)
 
     return render(request, 'dashboard.html', {
         'clients_count': clients_count,
         'projets_count': projets_count,
         'devis_count': devis_count,
-        'materiaux_count': materiaux_count,
         'total_ca': total_ca,
 
-        # charts
         'devis_brouillon': devis_brouillon,
         'devis_envoye': devis_envoye,
         'devis_accepte': devis_accepte,
         'devis_refuse': devis_refuse,
+
+        'derniers_devis': derniers_devis,
+        'projets': projets,
+        'projets_retard': projets_retard,
     })
-
-
 
 from django.contrib.auth.decorators import user_passes_test
 
@@ -331,10 +321,12 @@ def create_projet(request):
             client_id=request.POST["client"],
             nom=request.POST["nom"],
             localisation=request.POST["localisation"],
-            date_debut=request.POST.get("date_debut") or None
+            date_debut=request.POST.get("date_debut") or None,
+            budget=request.POST.get("budget") or 0,
+            progression=request.POST.get("progression") or 0
         )
-        return redirect("projet_list")
-
+        # return redirect("projet_list")
+        return redirect("liste_projets")
     return render(request, "projet/create.html", {
         "clients": clients
     })
@@ -356,7 +348,8 @@ def create_client(request):
             adresse=adresse
         )
 
-        return redirect('dashboard')
+        # return redirect('dashboard')
+        return redirect('liste_clients')
 
     return render(request, 'clients/create.html')
 
@@ -380,3 +373,119 @@ def create_materiau(request):
         return redirect('materiaux_list')
 
     return render(request, 'materiaux/create.html')
+
+def liste_projets(request):
+    projets = Projet.objects.select_related('client').all()
+
+    return render(
+        request,
+        'projet/list.html',
+        {'projets': projets}  # ✅ correct
+    )
+
+def edit_projet(request, id):
+    projet = Projet.objects.get(id=id)
+    clients = Client.objects.all()
+
+    if request.method == "POST":
+        projet.nom = request.POST["nom"]
+        projet.localisation = request.POST["localisation"]
+        projet.client_id = request.POST["client"]
+        projet.date_debut = request.POST.get("date_debut") or None
+
+        # ✅ CORRECTION ICI
+        projet.budget = request.POST.get("budget") or 0
+        projet.progression = request.POST.get("progression") or 0
+
+        projet.save()
+
+        return redirect("liste_projets")
+
+    return render(request, "projet/edit.html", {
+        "projet": projet,
+        "clients": clients
+    })
+
+
+def delete_projet(request, id):
+    projet = Projet.objects.get(id=id)
+    projet.delete()
+    return redirect("liste_projets")
+
+
+def detail_projet(request, id):
+    projet = Projet.objects.get(id=id)
+    return render(request, "projet/detail.html", {
+        "projet": projet,
+        "documents": projet.documents.all()
+    })
+
+def upload_document(request, id):
+    projet = Projet.objects.get(id=id)
+
+    if request.method == "POST":
+        DocumentProjet.objects.create(
+            projet=projet,
+            titre=request.POST.get("titre"),
+            fichier=request.FILES["fichier"]
+        )
+
+    return redirect("detail_projet", id=id)
+
+def clients(request):
+
+    if request.method == "POST":
+        Client.objects.create(
+            nom=request.POST["nom"],
+            telephone=request.POST["telephone"],
+            email=request.POST.get("email"),
+            adresse=request.POST.get("adresse")
+        )
+        return redirect("clients")
+
+    clients = Client.objects.all().order_by("-id")
+
+    return render(request, "client/index.html", {
+        "clients": clients
+    })
+
+def liste_clients(request):
+    clients = Client.objects.all().order_by('-id')
+
+    return render(
+        request,
+        'clients/list.html',
+        {
+            'clients': clients
+        }
+    )
+
+
+
+
+def detail_client(request, id):
+    client = get_object_or_404(Client, id=id)
+    return render(request, "clients/detail.html", {
+        "client": client
+    })
+
+def edit_client(request, id):
+    client = get_object_or_404(Client, id=id)
+
+    if request.method == "POST":
+        client.nom = request.POST.get("nom")
+        client.telephone = request.POST.get("telephone")
+        client.email = request.POST.get("email")
+        client.adresse = request.POST.get("adresse")
+        client.save()
+        messages.success(request, "Client modifié avec succès ✅")
+        return redirect("liste_clients")  # IMPORTANT
+
+    return render(request, "clients/edit.html", {
+        "client": client
+    })
+
+def delete_client(request, id):
+    client = get_object_or_404(Client, id=id)
+    client.delete()
+    return redirect('liste_clients')

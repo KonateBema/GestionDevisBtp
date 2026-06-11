@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier Client{% endblock %}
+
+{% block content %}
+
+<style>
+body{
+    background:#f4f6f9;
+}
+
+/* HEADER */
+.page-header{
+    background: linear-gradient(135deg,#0d6efd,#4f8cff);
+    color:white;
+    padding:18px 20px;
+    border-radius:15px;
+    margin-bottom:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* CARD */
+.card-form{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.06);
+}
+
+/* LABEL */
+.form-label{
+    font-weight:600;
+    margin-bottom:6px;
+    color:#495057;
+}
+
+/* INPUTS */
+.form-control{
+    border-radius:10px !important;
+    padding:10px;
+    border:1px solid #e0e0e0;
+    transition:0.2s;
+}
+
+.form-control:focus{
+    border-color:#0d6efd;
+    box-shadow:0 0 0 0.2rem rgba(13,110,253,0.15);
+}
+
+/* BUTTON */
+.btn-modern{
+    border-radius:10px;
+    padding:10px;
+    font-weight:600;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+}
+
+</style>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+
+        <div>
+            <h3 class="mb-0">✏️ Modifier Client</h3>
+            <small>Mettre à jour les informations du client</small>
+        </div>
+
+        <a href="{% url 'liste_clients' %}" class="btn btn-light btn-modern">
+            ⬅ Retour
+        </a>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="card-form">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Nom complet</label>
+                <input type="text" name="nom" value="{{ client.nom }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Téléphone</label>
+                <input type="text" name="telephone" value="{{ client.telephone }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" value="{{ client.email }}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Adresse</label>
+                <textarea name="adresse" rows="3" class="form-control">{{ client.adresse }}</textarea>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="actions mt-4">
+
+                <a href="{% url 'liste_clients' %}"
+                   class="btn btn-outline-secondary btn-modern w-50">
+                    Annuler
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary btn-modern w-50">
+                    💾 Enregistrer
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
