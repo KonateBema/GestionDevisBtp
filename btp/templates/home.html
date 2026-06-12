@@ -1,112 +1,303 @@
-
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Dashboard{% endblock %}
+
+{% block title %}Dashboard BTP{% endblock %}
 
 {% block content %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-    .card-box {
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-        text-align: center;
-    }
 
-    .big-number {
-        font-size: 28px;
-        font-weight: bold;
-    }
+body {
+    background: #f4f6f9;
+}
+
+/* HEADER */
+.dashboard-header {
+    margin-bottom: 25px;
+}
+
+.dashboard-header h2 {
+    font-weight: 800;
+    color: #111827;
+}
+
+/* KPI */
+.kpi-card {
+    border: none;
+    border-radius: 18px;
+    padding: 22px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.kpi-card:hover {
+    transform: translateY(-6px);
+}
+
+.kpi-icon {
+    font-size: 50px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    opacity: 0.25;
+}
+
+.kpi-title {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.kpi-value {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+/* COLORS */
+.bg-clients { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+.bg-projets { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+.bg-devis   { background: linear-gradient(135deg, #ea580c, #f97316); }
+.bg-ca      { background: linear-gradient(135deg, #16a34a, #22c55e); }
+
+/* CARD */
+.card-box {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.table th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.badge {
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid py-4">
 
-    <h3>📊 Dashboard BTP</h3>
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <h2>🏗️ Dashboard Gestion BTP</h2>
+        <p class="text-muted">Vue globale des projets, devis et clients</p>
+    </div>
 
-    <!-- STATS -->
-    <div class="row mt-3">
+    <!-- KPI -->
+    <div class="row g-4">
 
-        <div class="col-md-3">
-            <div class="card-box">
-                👤 Clients
-                <div class="big-number">{{ clients_count }}</div>
+        <div class="col-lg-3">
+            <div class="kpi-card bg-clients">
+                <i class="fa-solid fa-users kpi-icon"></i>
+                <div class="kpi-title">Clients</div>
+                <div class="kpi-value">{{ clients_count }}</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card-box">
-
-                <div class="brand">
-                    <img src="{% static 'images/logo-btp.png' %}" alt="Logo BTP" width="40">
-                    Projets
-                </div>
-
-                
-                <div class="big-number">{{ projets_count }}</div>
+        <div class="col-lg-3">
+            <div class="kpi-card bg-projets">
+                <i class="fa-solid fa-building kpi-icon"></i>
+                <div class="kpi-title">Projets</div>
+                <div class="kpi-value">{{ projets_count }}</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card-box">
-                📄 Devis
-                <div class="big-number">{{ devis_count }}</div>
+        <div class="col-lg-3">
+            <div class="kpi-card bg-devis">
+                <i class="fa-solid fa-file-contract kpi-icon"></i>
+                <div class="kpi-title">Devis</div>
+                <div class="kpi-value">{{ devis_count }}</div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card-box">
-                💰 CA
-                <div class="big-number">{{ total_ca }} FCFA</div>
+        <div class="col-lg-3">
+            <div class="kpi-card bg-ca">
+                <i class="fa-solid fa-sack-dollar kpi-icon"></i>
+                <div class="kpi-title">Chiffre d'affaires</div>
+                <div class="kpi-value">{{ total_ca|floatformat:0 }} FCFA</div>
             </div>
         </div>
 
     </div>
 
-    <!-- GRAPHIQUES -->
-    <div class="row mt-4">
+    <!-- CHARTS -->
+    <div class="row mt-4 g-4">
 
-        <!-- BAR CHART -->
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <div class="card-box">
                 <h5>📊 Statut des devis</h5>
                 <canvas id="devisChart"></canvas>
             </div>
         </div>
 
+        <div class="col-lg-4">
+            <div class="card-box">
+                <h5>📈 Répartition</h5>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PROJETS -->
+    <div class="card-box">
+        <h5>🌍 Suivi des projets</h5>
+
+        <table class="table table-hover align-middle mt-3">
+
+            <thead>
+                <tr>
+                    <th>Projet</th>
+                    <th>Client</th>
+                    <th>Budget</th>
+                    <th>Progression</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for p in projets %}
+                <tr>
+                    <td>{{ p.nom }}</td>
+                    <td>{{ p.client.nom }}</td>
+                    <td>{{ p.budget }} FCFA</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-bar bg-success"
+                                 style="width: {{ p.progression }}%">
+                                {{ p.progression }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        Aucun projet enregistré
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- ALERTES -->
+    <div class="card-box">
+        <h5>🔴 Alertes chantier</h5>
+
+        {% for p in projets_retard %}
+            <div class="alert alert-danger">
+                🏗️ {{ p.nom }} - {{ p.client.nom }}
+            </div>
+        {% empty %}
+            <div class="alert alert-success">
+                ✅ Aucun retard détecté
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- DERNIERS DEVIS -->
+    <div class="card-box">
+        <h5>📋 Derniers devis</h5>
+
+        <table class="table table-hover mt-3">
+
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Client</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for devis in derniers_devis %}
+                <tr>
+                    <td>{{ devis.numero }}</td>
+                    <td>{{ devis.projet.client.nom }}</td>
+                    <td>{{ devis.total }} FCFA</td>
+                    <td>
+                        {% if devis.statut == "accepte" %}
+                            <span class="badge bg-success">Accepté</span>
+                        {% elif devis.statut == "refuse" %}
+                            <span class="badge bg-danger">Refusé</span>
+                        {% elif devis.statut == "envoye" %}
+                            <span class="badge bg-primary">Envoyé</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Brouillon</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        Aucun devis disponible
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
     </div>
 
 </div>
 
+<!-- CHART JS SAFE -->
 <script>
-    const ctx = document.getElementById('devisChart');
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Brouillon', 'Envoyé', 'Accepté', 'Refusé'],
-            datasets: [{
-                label: 'Devis',
-                data: [
-                    {{ devis_brouillon }},
-            {{ devis_envoye }},
-                {{ devis_accepte }},
-        {{ devis_refuse }}
-            ],
-        backgroundColor: [
-        '#ffc107',
-        '#0d6efd',
-        '#198754',
-        '#dc3545'
-    ]
+const devisData = [
+    {{ devis_brouillon|default:0 }},
+    {{ devis_envoye|default:0 }},
+    {{ devis_accepte|default:0 }},
+    {{ devis_refuse|default:0 }}
+];
+
+new Chart(document.getElementById('devisChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Brouillon','Envoyé','Accepté','Refusé'],
+        datasets: [{
+            data: devisData,
+            backgroundColor: ['#f59e0b','#3b82f6','#22c55e','#ef4444']
         }]
-    },
-        options: {
-        responsive: true
     }
 });
+
+new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Accepté','Refusé','Envoyé','Brouillon'],
+        datasets: [{
+            data: [
+                {{ devis_accepte|default:0 }},
+                {{ devis_refuse|default:0 }},
+                {{ devis_envoye|default:0 }},
+                {{ devis_brouillon|default:0 }}
+            ],
+            backgroundColor: ['#22c55e','#ef4444','#3b82f6','#f59e0b']
+        }]
+    }
+});
+
 </script>
 
 {% endblock %}

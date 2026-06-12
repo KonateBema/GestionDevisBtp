@@ -4,35 +4,110 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <style>
-    .form-container {
-        max-width: 650px;
-        margin: 30px auto;
+    body {
+        background: linear-gradient(135deg, #f4f7fc, #e8f0ff);
     }
 
+    /* Container */
+    .form-container {
+        max-width: 750px;
+        margin: 40px auto;
+    }
+
+    /* Card */
     .card-form {
         border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.10);
+        transition: 0.3s;
     }
 
+    .card-form:hover {
+        transform: translateY(-3px);
+    }
+
+    /* Header */
     .header {
         background: linear-gradient(135deg, #0d6efd, #4f8cff);
         color: white;
-        padding: 20px;
-        border-radius: 15px 15px 0 0;
+        padding: 30px;
+        text-align: center;
     }
 
-    .form-control, .form-select {
-        border-radius: 10px;
-        padding: 10px;
+    .header h3 {
+        font-weight: 700;
     }
 
+    .header small {
+        opacity: 0.9;
+    }
+
+    /* Progress */
+    .progress {
+        height: 8px;
+        border-radius: 50px;
+    }
+
+    .progress-bar {
+        background: #198754;
+    }
+
+    /* Labels */
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    /* Inputs */
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 12px;
+        border: 1px solid #dce3ec;
+        transition: 0.3s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, .15);
+    }
+
+    /* Input Icon */
+    .input-group-text {
+        border-radius: 12px 0 0 12px;
+        background: #f8f9fa;
+    }
+
+    /* Buttons */
     .btn-modern {
-        border-radius: 10px;
-        padding: 10px;
-        font-weight: bold;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Footer Info */
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #6c757d;
     }
 </style>
 
@@ -41,9 +116,17 @@
     <div class="card card-form">
 
         <!-- HEADER -->
-        <div class="header text-center">
-            <h3 class="mb-0">🏗️ Créer un projet</h3>
-            <small>Ajouter un nouveau projet client</small>
+        <div class="header">
+            <h3>
+                <i class="bi bi-building-add"></i>
+                Création d'un projet BTP
+            </h3>
+            <small>Enregistrer un nouveau projet client</small>
+        </div>
+
+        <!-- Barre progression -->
+        <div class="progress rounded-0">
+            <div class="progress-bar" style="width:100%"></div>
         </div>
 
         <div class="p-4">
@@ -53,42 +136,89 @@
 
                 <!-- CLIENT -->
                 <div class="mb-3">
-                    <label class="form-label">👤 Client</label>
+                    <label class="form-label">
+                        <i class="bi bi-person-fill"></i>
+                        Client
+                    </label>
+
                     <select name="client" class="form-select" required>
-                        <option value="">-- Choisir un client --</option>
+                        <option value="">Sélectionner un client</option>
+
                         {% for client in clients %}
-                            <option value="{{ client.id }}">{{ client.nom }}</option>
+                        <option value="{{ client.id }}">
+                            {{ client.nom }}
+                        </option>
                         {% endfor %}
+
                     </select>
                 </div>
 
-                <!-- NOM -->
+                <!-- NOM PROJET -->
                 <div class="mb-3">
-                    <label class="form-label">🏗️ Nom du projet</label>
-                    <input type="text" name="nom" class="form-control" required>
+                    <label class="form-label">
+                        <i class="bi bi-building"></i>
+                        Nom du projet
+                    </label>
+
+                    <input type="text" name="nom" class="form-control" placeholder="Ex : Construction immeuble R+5"
+                        required>
                 </div>
 
                 <!-- LOCALISATION -->
                 <div class="mb-3">
-                    <label class="form-label">📍 Localisation</label>
-                    <input type="text" name="localisation" class="form-control">
+                    <label class="form-label">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        Localisation
+                    </label>
+
+                    <input type="text" name="localisation" class="form-control" placeholder="Ex : Cocody Riviera">
                 </div>
+
+
+                <!-- BUDGET -->
+                <div class="mb-3">
+                    <label>💰 Budget du projet</label>
+                    <input type="number" name="budget" class="form-control" step="0.01">
+                </div>
+
+                <!-- PROGRESSION -->
+                <div class="mb-3">
+                    <label>📊 Progression (%)</label>
+                    <input type="range" name="progression" min="0" max="100" class="form-range">
+                </div>
+
+
 
                 <!-- DATE -->
                 <div class="mb-3">
-                    <label class="form-label">📅 Date de début</label>
+                    <label class="form-label">
+                        <i class="bi bi-calendar-event"></i>
+                        Date de début
+                    </label>
+
                     <input type="date" name="date_debut" class="form-control">
                 </div>
 
-                <!-- BUTTONS -->
+                <!-- INFO -->
+                <div class="info-box">
+                    <i class="bi bi-info-circle-fill text-primary"></i>
+                    Les informations enregistrées serviront à la génération
+                    automatique des devis, factures et rapports du projet.
+                </div>
+
+                <!-- BOUTONS -->
                 <div class="d-flex justify-content-between mt-4">
 
                     <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-modern">
-                        ← Retour
+                        <i class="bi bi-arrow-left"></i>
+                        Retour
                     </a>
 
                     <button type="submit" class="btn btn-primary btn-modern">
-                        ✅ Créer projet
+
+                        <i class="bi bi-check-circle"></i>
+                        Créer le projet
+
                     </button>
 
                 </div>
